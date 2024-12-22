@@ -9,12 +9,12 @@ variable "vpc_id" {
 
 variable "ingress_rules" {
   type = list(object({
-    protocol   = string
-    rule_no    = number
+    protocol    = string
+    rule_no     = number
     rule_action = string
-    cidr_block = string
-    from_port  = number
-    to_port    = number
+    cidr_block  = string
+    from_port   = number
+    to_port     = number
   }))
 
   default = []
@@ -22,12 +22,12 @@ variable "ingress_rules" {
 
 variable "egress_rules" {
   type = list(object({
-    protocol   = string
-    rule_no    = number
+    protocol    = string
+    rule_no     = number
     rule_action = string
-    cidr_block = string
-    from_port  = number
-    to_port    = number
+    cidr_block  = string
+    from_port   = number
+    to_port     = number
   }))
 
   default = []
