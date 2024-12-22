@@ -1,10 +1,10 @@
-resource "aws_security_group" "this" {
+resource "aws_security_group" "song-sg-an2" {
   name   = var.name
   vpc_id = var.vpc_id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ingress" {
-  security_group_id            = aws_security_group.this.id
+  security_group_id            = aws_security_group.song-sg-an2.id
   for_each                     = { for idx, rule in var.ingress_rules : "${idx}_${rule.from_port}_${rule.to_port}" => rule }
   from_port                    = each.value.from_port
   to_port                      = each.value.to_port
