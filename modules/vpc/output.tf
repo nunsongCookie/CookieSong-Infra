@@ -1,5 +1,5 @@
 output "vpc_id" {
-  value = aws_vpc.song-vpc-an2.id
+  value = aws_vpc.vpc.id
 }
 
 output "public_subnet_ids" {

@@ -1,5 +1,5 @@
 # vpc
-resource "aws_vpc" "song-vpc-an2" {
+resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
@@ -12,7 +12,7 @@ resource "aws_vpc" "song-vpc-an2" {
 # 2 public subnet
 resource "aws_subnet" "public_subnets" {
   count             = length(var.public_subnet_names)
-  vpc_id            = aws_vpc.song-vpc-an2.id
+  vpc_id            = aws_vpc.vpc.id
   cidr_block        = var.public_subnet_cidr[count.index]
   availability_zone = var.availability_zone_list[count.index]
 
@@ -24,7 +24,7 @@ resource "aws_subnet" "public_subnets" {
 # 2 private web subnet
 resource "aws_subnet" "private_web_subnets" {
   count             = length(var.private_subnet_web_names)
-  vpc_id            = aws_vpc.song-vpc-an2.id
+  vpc_id            = aws_vpc.vpc.id
   cidr_block        = var.private_subnet_web_cidr[count.index]
   availability_zone = var.availability_zone_list[count.index]
 
@@ -36,7 +36,7 @@ resource "aws_subnet" "private_web_subnets" {
 # 2 private was subnet
 resource "aws_subnet" "private_was_subnets" {
   count             = length(var.private_subnet_was_names)
-  vpc_id            = aws_vpc.song-vpc-an2.id
+  vpc_id            = aws_vpc.vpc.id
   cidr_block        = var.private_subnet_was_cidr[count.index]
   availability_zone = var.availability_zone_list[count.index]
 
@@ -48,7 +48,7 @@ resource "aws_subnet" "private_was_subnets" {
 # 2 private rds subnet
 resource "aws_subnet" "private_rds_subnets" {
   count             = length(var.private_subnet_rds_names)
-  vpc_id            = aws_vpc.song-vpc-an2.id
+  vpc_id            = aws_vpc.vpc.id
   cidr_block        = var.private_subnet_rds_cidr[count.index]
   availability_zone = var.availability_zone_list[count.index]
 
@@ -59,7 +59,7 @@ resource "aws_subnet" "private_rds_subnets" {
 
 # Internet Gateway
 resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.song-vpc-an2.id
+  vpc_id = aws_vpc.vpc.id
   tags = {
     "Name" = "song-igw-an2"
   }
@@ -81,7 +81,7 @@ resource "aws_nat_gateway" "nat-gw" {
 
 # public Route table
 resource "aws_route_table" "pub-rt" {
-  vpc_id = aws_vpc.song-vpc-an2.id
+  vpc_id = aws_vpc.vpc.id
 
   tags = {
     "Name" = "song-rt-pub-an2"
@@ -95,7 +95,7 @@ resource "aws_route" "pubRoute" {
 
 # private Route table
 resource "aws_route_table" "pri-rt" {
-  vpc_id = aws_vpc.song-vpc-an2.id
+  vpc_id = aws_vpc.vpc.id
 
   tags = {
     "Name" = "song-rt-pri-an2"
@@ -132,4 +132,20 @@ resource "aws_route_table_association" "pri-rds-asso" {
   count          = 2
   subnet_id      = aws_subnet.private_rds_subnets[count.index].id
   route_table_id = aws_route_table.pri-rt.id
+}
+
+# vpc gateway endpoint
+resource "aws_vpc_endpoint" "vpc-vgw" {
+  vpc_id            = aws_vpc.vpc.id
+  service_name      = "com.amazon.ap-northeast-2.s3"
+  vpc_endpoint_type = "Gateway"
+
+  tags = {
+    "Name" = "song-vgw-an2"
+  }
+}
+
+resource "aws_vpc_endpoint_route_table_association" "vpc-vgw-rt-asso" {
+  route_table_id  = aws_route_table.pri-rt.id
+  vpc_endpoint_id = aws_vpc_endpoint.vpc-vgw
 }
