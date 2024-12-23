@@ -32,3 +32,7 @@ variable "egress_rules" {
 
   default = []
 }
+
+variable "subnet_ids" {
+  type = list(string)
+}

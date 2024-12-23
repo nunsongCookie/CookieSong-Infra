@@ -7,3 +7,5 @@ variable "private_was_subnet_ids" {}
 variable "security-group-id" {}
 
 variable "ec2-instance-ids" {}
+
+variable "certificate_arn" {}

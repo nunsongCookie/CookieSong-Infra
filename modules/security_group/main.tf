@@ -22,3 +22,4 @@ resource "aws_vpc_security_group_egress_rule" "egress" {
   cidr_ipv4                    = each.value.cidr_ipv4 != null ? each.value.cidr_ipv4 : null
   referenced_security_group_id = each.value.referenced_security_group_id != null ? each.value.referenced_security_group_id : null
 }
+

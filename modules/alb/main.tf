@@ -13,6 +13,10 @@ resource "aws_lb_target_group" "web-tg" {
     protocol = "HTTP"
     path     = "/health"
   }
+
+    tags = {
+    Resource = "web-target-group"
+  }
 }
 
 resource "aws_lb_target_group_attachment" "web-tg-att" {
@@ -38,6 +42,10 @@ resource "aws_lb_target_group" "was-tg" {
     enabled  = true
     protocol = "HTTP"
     path     = "/actuator/health"
+  }
+
+  tags = {
+    Resource = "was-target-group"
   }
 }
 
@@ -85,5 +93,35 @@ resource "aws_alb_listener" "internal-alb-listner" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.was-tg.arn
+  }
+}
+
+# External ALB에 HTTPS 리스너 추가
+resource "aws_alb_listener" "external-alb-https-listener" {
+  load_balancer_arn = aws_alb.external-alb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.certificate_arn 
+  
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.web-tg.arn
+  }
+}
+
+# HTTP to HTTPS redirection
+resource "aws_alb_listener" "external-alb-http-listener" {
+  load_balancer_arn = aws_alb.external-alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
 }
